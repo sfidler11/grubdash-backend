@@ -25,7 +25,7 @@ function dishExists(req, res, next) {
 
 //the following functions will validate if  dish has the correct name, description, price, and image values
 function validateName(req, res, next) {
-    const { data: {name} = {}} = req.body;
+    const { data: {name} = {} } = req.body;
     if(name && name.length > 0){
         return next();
     }
@@ -47,7 +47,7 @@ function validateDescripiton(req, res, next) {
 };
 
 function validatePrice(req, res, next) {
-    const { data: {price} = {}} = req.body;
+    const { data: {price} = {} } = req.body;
     if(!price){
         next({
             status: 400,
@@ -58,7 +58,7 @@ function validatePrice(req, res, next) {
 }
 
 function validatePriceParams(req, res, next){
-    const { data: {price} = {}} = req.body;
+    const { data: {price} = {} } = req.body;
     const priceNumber = Number(price);
     if(priceNumber > 0 && Number.isInteger(price)){
         return next();
@@ -70,7 +70,7 @@ function validatePriceParams(req, res, next){
 }
 
 function validateImage(req, res, next) {
-    const { data: {image_url} = {}} = req.body;
+    const { data: {image_url} = {} } = req.body;
     if(image_url && image_url.length > 0){
         return next();
     }
@@ -83,8 +83,10 @@ function validateImage(req, res, next) {
 //create a new dish
 function newDish(req, res, next){
     const { data: {name, description, price, image_url} = {}} = req.body;
+    //calls the nextId function to create a uniqure id for the dish
     const id = nextId();
 
+    //the new dish must have the following parameters, these are validated by the validation functions
     const newDish = {
         id: id,
         name,
@@ -109,14 +111,11 @@ function updateDish(req, res, next) {
         });
 
     }
-    const updatedDish = {
-        id: originalDishId,
-        name,
-        description,
-        price,
-        image_url
-    }
-    dish = updatedDish
+    //removed the ability to update the dish id in the update section
+    dish.name = name;
+    dish.description = description;
+    dish.price = price;
+    dish.image_url = image_url;
     res.json({ data: dish })
 }
 
@@ -127,9 +126,10 @@ function readDish(req, res, next) {
 
 //returns a list of all of the dishes
 function listDishes(req, res, next) {
-    const { orderId} = req.params;
+    const { orderId } = req.params;
     res.json({ data: dishes.filter(orderId ? dish => dish.id === Number(orderId) : () => true)});
 }
+
 module.exports = {
     listDishes,
     read: [dishExists, readDish],

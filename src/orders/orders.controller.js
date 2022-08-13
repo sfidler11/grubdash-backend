@@ -21,8 +21,9 @@ function orderExists(req, res, next){
 };
 
 //the following function validate an order request
+//the deliverTo, mobileNumber, dishes, and quantity object in the order array have to abide by specific conditions
 function validateDeliverTo(req, res, next) {
-    const { data: {deliverTo} = {}} = req.body;
+    const { data: {deliverTo} = {} } = req.body;
     if(deliverTo && deliverTo.length > 0) {
         return next();
     }
@@ -33,7 +34,7 @@ function validateDeliverTo(req, res, next) {
 };
 
 function validateMobileNumber(req, res, next) {
-    const { data: {mobileNumber} = {}} = req.body;
+    const { data: {mobileNumber} = {} } = req.body;
     if(mobileNumber && mobileNumber.length > 0) {
         return next();
     }
@@ -44,7 +45,7 @@ function validateMobileNumber(req, res, next) {
 };
 
 function validateDishes(req, res, next) {
-    const  {data: {dishes} = {}} = req.body;
+    const  {data: {dishes} = {} } = req.body;
     if(!dishes){
         return next({
             status: 400,
@@ -62,7 +63,7 @@ function validateDishes(req, res, next) {
 };
 
 function validateDishQuantity (req, res, next) {
-    const {data: {dishes} = {}} = req.body;
+    const {data: {dishes} = {} } = req.body;
     for (index in dishes){
         let dish = dishes[index];
         const quantity  = dish.quantity
@@ -116,22 +117,17 @@ function updateOrder (req, res, next) {
             message: "A delivered order cannot be changed",
         })
     }
-
-    const updatedOrder = {
-        id: orderId,
-        deliverTo,
-        mobileNumber,
-        status,
-        dishes
-    }
-
-    order = updatedOrder
+    //removed the ability to change the order id in the update section
+    order.deliverTo = deliverTo;
+    order.mobileNumber = mobileNumber;
+    order.status = status;
+    order.dishes = dishes;
     res.json({ data: order});
 }
 
 //to delete an order
 function deleteOrder(req, res, next) {
-    const {orderId} = req.params;
+    const { orderId } = req.params;
     const orderToDelete = orders.find((order) => order.id = orderId);
     const index = orders.findIndex((order) => order.id = orderId);
     if(orderToDelete.status !== "pending"){
@@ -148,12 +144,12 @@ function deleteOrder(req, res, next) {
 
 //reads a specific order with the ordered dish
 function readOrder(req, res, next) {
-    res.json({ data: res.locals.order});
+    res.json({ data: res.locals.order });
 }
 
 //shows all of the orders and associated dishes
 function listOrders(req, res, next) {
-    res.json({ data: orders})
+    res.json({ data: orders })
 }
 
 module.exports = {
